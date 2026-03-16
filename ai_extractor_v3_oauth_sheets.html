@@ -1,0 +1,498 @@
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0D0D0D;--paper:#F7F5F0;--accent:#2B5BFF;--muted:#888;
+  --border:rgba(0,0,0,0.1);--card:#fff;--green:#1A7A4A;--green-bg:#EDFAF3;
+  --warn:#9A6C00;--warn-bg:#FFF8E1;--tag-bg:#EEF2FF;--tag-fg:#2B5BFF;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink)}
+.app{max-width:860px;margin:0 auto;padding:2rem 1.5rem 4rem}
+.header{margin-bottom:1.5rem}
+.header h1{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;letter-spacing:-0.03em}
+.header h1 span{color:var(--accent)}
+.header p{font-size:13px;color:var(--muted);margin-top:4px}
+
+/* Setup banner */
+.setup-banner{background:var(--warn-bg);border:1px solid #F5D76E;border-radius:14px;padding:1rem 1.25rem;margin-bottom:1.5rem;display:none}
+.setup-banner.visible{display:block}
+.setup-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--warn);margin-bottom:8px}
+.setup-steps{font-size:12px;color:#5C4500;line-height:2}
+.setup-steps code{background:#FFF3CD;padding:1px 6px;border-radius:4px;font-family:monospace;font-size:11px}
+.setup-toggle{font-size:12px;color:var(--accent);cursor:pointer;margin-top:6px;display:inline-block}
+
+/* Auth card */
+.auth-card{background:var(--card);border-radius:14px;border:1.5px solid var(--border);padding:1rem 1.25rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.auth-info{display:flex;align-items:center;gap:10px}
+.auth-avatar{width:32px;height:32px;border-radius:50%;background:#EEF2FF;display:flex;align-items:center;justify-content:center;font-size:16px}
+.auth-name{font-size:13px;font-weight:500}
+.auth-email{font-size:11px;color:var(--muted)}
+.google-btn{display:flex;align-items:center;gap:8px;padding:9px 16px;background:#fff;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;transition:background 0.15s;white-space:nowrap}
+.google-btn:hover{background:#F8F9FA}
+.google-btn svg{width:16px;height:16px;flex-shrink:0}
+.signout-btn{font-size:12px;color:var(--muted);cursor:pointer;border:none;background:none;font-family:'DM Sans',sans-serif}
+.signout-btn:hover{color:var(--ink)}
+
+/* Sheet config */
+.sheet-config{background:var(--card);border-radius:14px;border:1.5px solid var(--border);padding:1rem 1.25rem;margin-bottom:1rem;display:none}
+.sheet-config.visible{display:block}
+.config-label{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.config-row{display:flex;gap:8px;align-items:center}
+.text-input{flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--paper);color:var(--ink);outline:none;transition:border-color 0.2s}
+.text-input:focus{border-color:var(--accent)}
+.config-hint{font-size:11px;color:var(--muted);margin-top:5px}
+
+/* Sources */
+.sources-wrap{display:flex;flex-direction:column;gap:10px;margin-bottom:1.25rem}
+.source-card{background:var(--card);border-radius:14px;border:1.5px solid var(--border);overflow:hidden;transition:border-color 0.2s}
+.source-card.active{border-color:var(--accent)}
+.source-header{display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;user-select:none}
+.source-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.source-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700}
+.source-sub{font-size:11px;color:var(--muted)}
+.source-toggle{margin-left:auto;width:34px;height:19px;background:#E0E0E0;border-radius:99px;position:relative;transition:background 0.2s;cursor:pointer;flex-shrink:0}
+.source-toggle.on{background:var(--accent)}
+.source-toggle::after{content:'';position:absolute;top:2px;left:2px;width:15px;height:15px;background:white;border-radius:50%;transition:transform 0.2s}
+.source-toggle.on::after{transform:translateX(15px)}
+.source-body{padding:0 16px 12px;display:none}
+.source-body.open{display:block}
+.drop-zone{border:1.5px dashed var(--border);border-radius:10px;padding:14px;text-align:center;font-size:12px;color:var(--muted);cursor:pointer;transition:all 0.2s;position:relative}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--accent);background:#F0F4FF}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.file-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:var(--green-bg);color:var(--green);border-radius:99px;font-size:11px;font-weight:500;margin-top:6px}
+.file-badge .rm{cursor:pointer;color:#999;margin-left:2px}
+
+/* Extract btn */
+.extract-btn{width:100%;padding:13px;background:var(--accent);color:white;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;letter-spacing:0.02em;transition:opacity 0.2s;margin-bottom:10px}
+.extract-btn:hover{opacity:0.9}
+.extract-btn:disabled{opacity:0.4;cursor:not-allowed}
+.progress-wrap{display:none;margin-bottom:10px}
+.progress-bar-outer{height:3px;background:var(--border);border-radius:99px;overflow:hidden;margin-bottom:6px}
+.progress-bar-inner{height:100%;background:var(--accent);border-radius:99px;width:0%;transition:width 0.5s ease}
+.progress-log{font-size:12px;color:var(--muted);line-height:1.9;max-height:72px;overflow-y:auto}
+.progress-log .ok{color:var(--green)}
+.progress-log .act{color:var(--accent);font-weight:500}
+.error-box{background:#FFF0EE;border:1px solid #FFD5CE;border-radius:10px;padding:10px 14px;font-size:13px;color:#C0331B;display:none;margin-bottom:10px}
+
+/* Results */
+.result-area{display:none}
+.result-area.visible{display:block}
+.sources-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:1rem;align-items:center}
+.chip-label{font-size:12px;color:var(--muted)}
+.chip{padding:3px 9px;border-radius:99px;font-size:11px;font-weight:500;background:var(--green-bg);color:var(--green)}
+.section-block{background:var(--card);border-radius:14px;border:1px solid var(--border);margin-bottom:1rem;overflow:hidden}
+.section-head{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--border);cursor:pointer}
+.section-head-left{display:flex;align-items:center;gap:8px}
+.section-icon{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.section-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700}
+.collapsed .section-body{display:none}
+.chevron{font-size:11px;color:var(--muted);transition:transform 0.2s}
+.collapsed .chevron{transform:rotate(-90deg)}
+.field-row{display:grid;grid-template-columns:170px 1fr;border-bottom:1px solid var(--border);min-height:40px}
+.field-row:last-child{border-bottom:none}
+.field-key{padding:10px 14px 10px 14px;font-size:12px;color:var(--muted);font-weight:500;background:#FAFAF8;display:flex;align-items:flex-start;padding-top:12px;border-right:1px solid var(--border)}
+.field-val{padding:9px 12px;font-size:13px;line-height:1.6;outline:none}
+.field-val:focus{background:#F0F4FF}
+.field-val:empty:before{content:attr(data-placeholder);color:#CCC;font-style:italic;font-size:12px}
+.tag{display:inline-block;padding:2px 9px;background:var(--tag-bg);color:var(--tag-fg);border-radius:99px;font-size:11px;font-weight:500;margin:2px 2px 2px 0}
+.missing{color:#CCC;font-style:italic;font-size:12px}
+.actions{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem;flex-wrap:wrap}
+.btn-sec{padding:9px 16px;border:1.5px solid var(--border);background:white;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer}
+.btn-sheets{padding:9px 18px;background:#0F9D58;color:white;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px}
+.btn-sheets:disabled{opacity:0.4;cursor:not-allowed}
+.btn-pri{padding:9px 16px;background:var(--ink);color:white;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer}
+.sheets-result{font-size:13px;padding:8px 12px;border-radius:8px;margin-top:8px;display:none}
+.sheets-result.ok{background:var(--green-bg);color:var(--green)}
+.sheets-result.err{background:#FFF0EE;color:#C0331B}
+</style>
+
+<div class="app">
+  <div class="header">
+    <h1>AI企業情報<span>自動抽出</span> <span style="font-size:12px;font-weight:400;color:var(--muted)">v3 + Sheets連携</span></h1>
+    <p>抽出結果をGoogleスプレッドシートに自動で書き込みます</p>
+  </div>
+
+  <!-- Setup guide -->
+  <div style="margin-bottom:1rem">
+    <span class="setup-toggle" onclick="document.getElementById('setupBanner').classList.toggle('visible')">⚙️ 初回設定ガイドを表示</span>
+  </div>
+  <div class="setup-banner" id="setupBanner">
+    <div class="setup-title">🔧 初回のみ：Google Cloud Console設定（5分）</div>
+    <div class="setup-steps">
+      1. <a href="https://console.cloud.google.com" target="_blank" style="color:var(--accent)">Google Cloud Console</a> を開く<br>
+      2. 新しいプロジェクトを作成（例：<code>ai-navi-extractor</code>）<br>
+      3. 「APIとサービス」→「ライブラリ」→ <code>Google Sheets API</code> を有効化<br>
+      4. 「認証情報」→「OAuthクライアントID」を作成（種類：<code>ウェブアプリケーション</code>）<br>
+      5. 「承認済みのJavaScript生成元」に <code>https://claude.ai</code> を追加<br>
+      6. 作成されたクライアントIDを下の入力欄に貼り付ける<br>
+      7. 「OAuth同意画面」→ テストユーザーに自分のGmailを追加
+    </div>
+    <span class="setup-toggle" onclick="document.getElementById('setupBanner').classList.remove('visible')">▲ 閉じる</span>
+  </div>
+
+  <!-- Client ID config -->
+  <div class="sheet-config visible" id="clientConfig">
+    <div class="config-label">Google OAuth クライアントID</div>
+    <div class="config-row">
+      <input class="text-input" id="clientIdInput" placeholder="xxxxxxxxxx.apps.googleusercontent.com" />
+      <button class="google-btn" onclick="initGoogleAuth()" style="white-space:nowrap">設定する</button>
+    </div>
+    <div class="config-hint">Google Cloud ConsoleのOAuthクライアントIDを貼り付けてください</div>
+  </div>
+
+  <!-- Google Auth -->
+  <div class="auth-card" id="authCard">
+    <div class="auth-info" id="authInfo">
+      <div class="auth-avatar">👤</div>
+      <div>
+        <div class="auth-name">Googleアカウントで認証してください</div>
+        <div class="auth-email">スプレッドシートへの書き込みに必要です</div>
+      </div>
+    </div>
+    <button class="google-btn" id="signInBtn" onclick="signIn()">
+      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Googleでサインイン
+    </button>
+  </div>
+
+  <!-- Sheet URL config -->
+  <div class="sheet-config" id="sheetConfig">
+    <div class="config-label">書き込み先スプレッドシート</div>
+    <div class="config-row">
+      <input class="text-input" id="sheetUrlInput" placeholder="https://docs.google.com/spreadsheets/d/xxxxxxxxxx/edit" />
+    </div>
+    <div class="config-hint">先ほどダウンロードしたテンプレートシートのURLを貼り付けてください。シート名：「企業管理一覧」に追記します。</div>
+  </div>
+
+  <!-- Sources -->
+  <div class="sources-wrap">
+    <div class="source-card active" id="card-url">
+      <div class="source-header">
+        <div class="source-icon" style="background:#EEF2FF">🌐</div>
+        <div>
+          <div class="source-title">企業サイト URL <span style="font-size:10px;color:var(--accent);margin-left:4px">必須</span></div>
+          <div class="source-sub">トップページ → サービス・会社概要ページを自動巡回</div>
+        </div>
+        <div class="source-toggle on"></div>
+      </div>
+      <div class="source-body open">
+        <input class="text-input" id="urlInput" type="text" placeholder="https://example.co.jp" style="width:100%" />
+      </div>
+    </div>
+
+    <div class="source-card" id="card-pdf">
+      <div class="source-header" onclick="toggleSource('pdf')">
+        <div class="source-icon" style="background:#FFF0EE">📄</div>
+        <div><div class="source-title">PDF・会社資料</div><div class="source-sub">会社概要・サービス説明書（複数可）</div></div>
+        <div class="source-toggle" id="toggle-pdf"></div>
+      </div>
+      <div class="source-body" id="body-pdf">
+        <div class="drop-zone" ondragover="onDragOver(event,'pdf')" ondragleave="onDragLeave('pdf')" ondrop="onDrop(event,'pdf')" id="dz-pdf">
+          <input type="file" accept=".pdf" multiple onchange="onFileSelect(event,'pdf')" />
+          📎 クリックまたはドラッグ＆ドロップ（PDF）
+        </div>
+        <div id="pdf-files"></div>
+      </div>
+    </div>
+
+    <div class="source-card" id="card-gdoc">
+      <div class="source-header" onclick="toggleSource('gdoc')">
+        <div class="source-icon" style="background:#E8F5E9">📝</div>
+        <div><div class="source-title">Google ドキュメント</div><div class="source-sub">議事録・ヒアリングメモのURL</div></div>
+        <div class="source-toggle" id="toggle-gdoc"></div>
+      </div>
+      <div class="source-body" id="body-gdoc">
+        <input class="text-input" id="gdocInput" placeholder="https://docs.google.com/document/d/..." style="width:100%;margin-bottom:5px" />
+        <div style="font-size:11px;color:var(--muted)">※「リンクを知っている全員が閲覧可」に設定が必要</div>
+      </div>
+    </div>
+
+    <div class="source-card" id="card-docx">
+      <div class="source-header" onclick="toggleSource('docx')">
+        <div class="source-icon" style="background:#E3F2FD">📃</div>
+        <div><div class="source-title">Word ファイル (.docx)</div><div class="source-sub">議事録・打ち合わせメモ</div></div>
+        <div class="source-toggle" id="toggle-docx"></div>
+      </div>
+      <div class="source-body" id="body-docx">
+        <div class="drop-zone" ondragover="onDragOver(event,'docx')" ondragleave="onDragLeave('docx')" ondrop="onDrop(event,'docx')" id="dz-docx">
+          <input type="file" accept=".docx,.doc" multiple onchange="onFileSelect(event,'docx')" />
+          📎 クリックまたはドラッグ＆ドロップ（Word）
+        </div>
+        <div id="docx-files"></div>
+      </div>
+    </div>
+  </div>
+
+  <button class="extract-btn" id="extractBtn" onclick="startExtraction()">すべての情報源から抽出する</button>
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-bar-outer"><div class="progress-bar-inner" id="progressBar"></div></div>
+    <div class="progress-log" id="progressLog"></div>
+  </div>
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="result-area" id="resultArea"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<script>
+const state = { sources:{url:true,pdf:false,gdoc:false,docx:false}, pdfFiles:[], docxFiles:[], token:null, user:null, data:null };
+
+// ---- Google Auth ----
+function initGoogleAuth() {
+  const clientId = document.getElementById('clientIdInput').value.trim();
+  if (!clientId) { alert('クライアントIDを入力してください'); return; }
+  localStorage.setItem('gClientId', clientId);
+  document.getElementById('clientConfig').style.display = 'none';
+  alert('設定しました。Googleサインインボタンを押して認証してください。');
+}
+
+function signIn() {
+  const clientId = localStorage.getItem('gClientId') || document.getElementById('clientIdInput').value.trim();
+  if (!clientId) { alert('先にクライアントIDを設定してください'); return; }
+  const scope = 'https://www.googleapis.com/auth/spreadsheets email profile';
+  const redirectUri = window.location.origin;
+  const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(clientId)}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent(scope)}&prompt=select_account`;
+  const popup = window.open(url, 'google_auth', 'width=500,height=600');
+  const timer = setInterval(() => {
+    try {
+      if (popup.closed) { clearInterval(timer); return; }
+      const hash = popup.location.hash;
+      if (hash && hash.includes('access_token')) {
+        clearInterval(timer);
+        popup.close();
+        const params = new URLSearchParams(hash.substring(1));
+        const token = params.get('access_token');
+        if (token) onSignedIn(token);
+      }
+    } catch(e) {}
+  }, 500);
+}
+
+async function onSignedIn(token) {
+  state.token = token;
+  const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization: 'Bearer ' + token } });
+  const u = await res.json();
+  state.user = u;
+  document.getElementById('authInfo').innerHTML = `
+    <div class="auth-avatar" style="background:#EEF2FF;overflow:hidden">${u.picture ? `<img src="${u.picture}" style="width:32px;height:32px;border-radius:50%">` : '👤'}</div>
+    <div><div class="auth-name">${u.name || u.email}</div><div class="auth-email">${u.email}</div></div>`;
+  document.getElementById('signInBtn').outerHTML = `<button class="signout-btn" onclick="signOut()">サインアウト</button>`;
+  document.getElementById('sheetConfig').classList.add('visible');
+}
+
+function signOut() {
+  state.token = null; state.user = null;
+  location.reload();
+}
+
+// ---- Sources ----
+function toggleSource(name) {
+  state.sources[name] = !state.sources[name];
+  document.getElementById('toggle-'+name).classList.toggle('on', state.sources[name]);
+  document.getElementById('body-'+name).classList.toggle('open', state.sources[name]);
+  document.getElementById('card-'+name).classList.toggle('active', state.sources[name]);
+}
+function onDragOver(e,t){e.preventDefault();document.getElementById('dz-'+t).classList.add('drag')}
+function onDragLeave(t){document.getElementById('dz-'+t).classList.remove('drag')}
+function onDrop(e,t){e.preventDefault();onDragLeave(t);handleFiles(e.dataTransfer.files,t)}
+function onFileSelect(e,t){handleFiles(e.target.files,t)}
+function handleFiles(files,type){
+  const arr=type==='pdf'?state.pdfFiles:state.docxFiles;
+  for(const f of files)arr.push(f);
+  renderFiles(type);
+  if(!state.sources[type])toggleSource(type);
+}
+function renderFiles(type){
+  const arr=type==='pdf'?state.pdfFiles:state.docxFiles;
+  document.getElementById(type+'-files').innerHTML=arr.map((f,i)=>
+    `<div class="file-badge">📎 ${f.name} <span class="rm" onclick="removeFile('${type}',${i})">✕</span></div>`).join('');
+}
+function removeFile(t,i){(t==='pdf'?state.pdfFiles:state.docxFiles).splice(i,1);renderFiles(t)}
+
+async function fileToBase64(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(f)})}
+async function docxToText(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=async e=>{try{const x=await mammoth.extractRawText({arrayBuffer:e.target.result});res(x.value)}catch(err){rej(err)}};r.onerror=rej;r.readAsArrayBuffer(f)})}
+
+// ---- Progress ----
+function log(msg,type='act'){
+  const el=document.getElementById('progressLog');
+  el.querySelectorAll('.act').forEach(e=>{e.className='ok';e.textContent='✓ '+e.textContent.replace(/^→\s*/,'')});
+  const d=document.createElement('div');d.className=type;d.textContent='→ '+msg;
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+}
+function setProgress(p){document.getElementById('progressBar').style.width=p+'%'}
+function showError(msg){const el=document.getElementById('errorBox');el.textContent=msg;el.style.display='block'}
+
+// ---- Extraction ----
+async function startExtraction(){
+  const url=document.getElementById('urlInput').value.trim();
+  if(!url){showError('URLを入力してください');return}
+  document.getElementById('errorBox').style.display='none';
+  document.getElementById('extractBtn').disabled=true;
+  document.getElementById('progressWrap').style.display='block';
+  document.getElementById('progressLog').innerHTML='';
+  document.getElementById('resultArea').classList.remove('visible');
+  setProgress(5);
+
+  const usedSources=[];
+  const contentBlocks=[];
+  const gdocUrl=document.getElementById('gdocInput').value.trim();
+
+  try{
+    log('情報源を準備中...');setProgress(10);
+    let promptText=`あなたはAI企業の紹介ページ掲載情報を抽出する専門家です。複数の情報源を統合し、以下のJSON形式のみで出力してください（マークダウン不可）。議事録・ヒアリング資料がある場合はそちらを優先してください。
+
+{"company_name":"","catchcopy":"","overview":"","founded":"","employees":"","location":"","area":"","hp_url":"","fields":[],"genres":[],"points":[{"title":"","desc":""},{"title":"","desc":""},{"title":"","desc":""},{"title":"","desc":""}],"cases":[{"name":"","category":"","summary":""}],"clients":[],"partners":[],"team":[{"name":"","title":"","bio":""}],"slug":"","meta_description":"","contact_url":"","subsidy":"","missing_items":[],"sources_used":[]}
+
+情報源：\n\n--- 企業HP ---\n${url}\n（トップページ＋サービス・会社概要・実績ページを巡回して抽出）`;
+
+    usedSources.push('HP URL');
+
+    if(state.sources.gdoc&&gdocUrl){
+      log('Google ドキュメントを取得中...');usedSources.push('Google Doc');
+      promptText+=`\n\n--- Google ドキュメント（議事録）---\n${gdocUrl}\n（このURLを取得して参照）`;
+      setProgress(30);
+    }
+    if(state.sources.docx&&state.docxFiles.length){
+      log(`Wordファイルを読み込み中... (${state.docxFiles.length}件)`);
+      for(const f of state.docxFiles){
+        const text=await docxToText(f);usedSources.push('Word: '+f.name);
+        promptText+=`\n\n--- Word: ${f.name} ---\n${text.substring(0,8000)}`;
+      }
+      setProgress(45);
+    }
+    if(state.sources.pdf&&state.pdfFiles.length){
+      log(`PDFを読み込み中... (${state.pdfFiles.length}件)`);
+      for(const f of state.pdfFiles){
+        const b64=await fileToBase64(f);usedSources.push('PDF: '+f.name);
+        contentBlocks.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}});
+        contentBlocks.push({type:'text',text:`（上記PDF：${f.name}）`});
+      }
+      setProgress(55);
+    }
+    contentBlocks.push({type:'text',text:promptText});
+    log('Claude APIで抽出・統合中...');setProgress(65);
+
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,tools:[{type:'web_search_20250305',name:'web_search'}],messages:[{role:'user',content:contentBlocks}]})
+    });
+    const data=await res.json();
+    if(data.error)throw new Error(data.error.message);
+    const textBlock=data.content.find(b=>b.type==='text');
+    if(!textBlock)throw new Error('レスポンスがありません');
+    const jm=textBlock.text.replace(/```json|```/g,'').match(/\{[\s\S]*\}/);
+    if(!jm)throw new Error('JSON形式で返ってきませんでした');
+    const d=JSON.parse(jm[0]);
+    d._usedSources=usedSources;
+    state.data=d;
+    setProgress(100);log('完了！','ok');
+    setTimeout(()=>renderResult(d),400);
+  }catch(e){
+    showError('エラー: '+e.message);
+    document.getElementById('extractBtn').disabled=false;
+  }
+}
+
+// ---- Render Result ----
+function renderResult(d){
+  document.getElementById('extractBtn').disabled=false;
+  const area=document.getElementById('resultArea');
+  const sections=[
+    {icon:'🏢',name:'基本情報',color:'#EEF2FF',fields:[['会社名',d.company_name],['キャッチコピー',d.catchcopy],['会社概要',d.overview],['設立',d.founded],['従業員数',d.employees],['本社所在地',d.location],['対応エリア',d.area],['HP',d.hp_url?`<a href="${d.hp_url}" style="color:var(--accent)">${d.hp_url}</a>`:''],]},
+    {icon:'⚡',name:'強み・特徴',color:'#FFF8E1',fields:[['対応分野',tagsHtml(d.fields)],['得意業界',tagsHtml(d.genres)],...((d.points||[]).filter(p=>p.title).map((p,i)=>[`ポイント${i+1}`,`<strong>${p.title}</strong><br><span style="color:var(--muted);font-size:12px">${p.desc}</span>`]))]},
+    {icon:'📊',name:'実績・取引先',color:'#EDFAF3',fields:[...(d.cases||[]).filter(c=>c.name).map((c,i)=>[`事例${i+1}`,`${c.name} <span class="tag">${c.category}</span><br><span style="color:var(--muted);font-size:12px">${c.summary}</span>`]),['主要取引先',tagsHtml(d.clients)],['認定パートナー',tagsHtml(d.partners)],]},
+    {icon:'👥',name:'チーム',color:'#FFF0EE',fields:(d.team||[]).filter(m=>m.name).map(m=>[m.name,`<span style="font-size:12px;font-weight:600;color:var(--accent)">${m.title}</span><br><span style="font-size:12px;color:var(--muted)">${m.bio}</span>`])},
+    {icon:'🔗',name:'掲載詳細',color:'#F3F4F6',fields:[['推奨スラッグ',d.slug?`<code style="background:#EEF2FF;padding:2px 8px;border-radius:4px;font-size:12px">/agency/${d.slug}</code>`:''],['SEOメタ',d.meta_description],['問い合わせ',d.contact_url?`<a href="${d.contact_url}" style="color:var(--accent)">${d.contact_url}</a>`:''],['補助金',d.subsidy]]},
+  ];
+  if(d.missing_items?.length)sections.push({icon:'⚠️',name:'要確認',color:'#FFF8E1',fields:d.missing_items.map((x,i)=>[`#${i+1}`,`<span style="color:var(--warn)">${x}</span>`])});
+
+  let html=`<div class="sources-chips"><span class="chip-label">参照元：</span>${(d._usedSources||[]).map(s=>`<span class="chip">✓ ${s}</span>`).join('')}</div>`;
+  sections.forEach(sec=>{
+    if(!sec.fields.length)return;
+    html+=`<div class="section-block"><div class="section-head" onclick="this.closest('.section-block').classList.toggle('collapsed')"><div class="section-head-left"><div class="section-icon" style="background:${sec.color}">${sec.icon}</div><span class="section-name">${sec.name}</span></div><span class="chevron">▼</span></div><div class="section-body">`;
+    sec.fields.forEach(([k,v])=>{const dv=v&&String(v)!=='undefined'&&String(v)!==''?v:`<span class="missing">要確認</span>`;html+=`<div class="field-row"><div class="field-key">${k}</div><div class="field-val" contenteditable="true" data-placeholder="未入力">${dv}</div></div>`;});
+    html+=`</div></div>`;
+  });
+
+  const sheetsDisabled=!state.token?'disabled':'';
+  const sheetsTitle=!state.token?'Googleサインインが必要です':'';
+  html+=`<div class="actions">
+    <button class="btn-sec" onclick="copyText()">テキストコピー</button>
+    <button class="btn-sec" onclick="exportJSON()">JSONで保存</button>
+    <button class="btn-sheets" id="sheetsBtn" onclick="writeToSheets()" ${sheetsDisabled} title="${sheetsTitle}">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H7v-2h5v2zm5-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+      スプレッドシートに書き込む
+    </button>
+  </div>
+  <div class="sheets-result" id="sheetsResult"></div>`;
+
+  area.innerHTML=html;
+  area.classList.add('visible');
+  area.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function tagsHtml(arr){if(!arr?.length)return'<span class="missing">要確認</span>';return arr.map(t=>`<span class="tag">${t}</span>`).join('')}
+function copyText(){const d=state.data;if(!d)return;navigator.clipboard.writeText(`【${d.company_name}】\n${d.catchcopy}\n\n${d.overview}`).then(()=>alert('コピーしました'))}
+function exportJSON(){const d=state.data;if(!d)return;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:'application/json'}));a.download=(d.slug||'company')+'_hearing.json';a.click()}
+
+// ---- Sheets Write ----
+async function writeToSheets(){
+  const d=state.data;
+  if(!d||!state.token){showSheetsResult('Googleサインインが必要です','err');return}
+  const sheetUrl=document.getElementById('sheetUrlInput').value.trim();
+  if(!sheetUrl){showSheetsResult('スプレッドシートのURLを入力してください','err');return}
+  const match=sheetUrl.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+  if(!match){showSheetsResult('スプレッドシートのURLが正しくありません','err');return}
+  const sheetId=match[1];
+
+  document.getElementById('sheetsBtn').disabled=true;
+  showSheetsResult('書き込み中...','');
+
+  const row=[
+    '',  // No（空白、手動で入力）
+    d.company_name||'',
+    d.catchcopy||'',
+    (d.fields||[]).join(' / '),
+    (d.genres||[]).join(' / '),
+    d.founded||'',
+    d.employees||'',
+    d.location||'',
+    d.area||'',
+    (d.clients||[]).join(' / '),
+    (d.partners||[]).join(' / '),
+    (d.team||[]).length.toString(),
+    d.hp_url||'',
+    d.slug||'',
+    d.subsidy||'',
+    '情報収集中',  // ステータス初期値
+    '',  // 担当者
+    '',  // 備考
+  ];
+
+  try{
+    const appendUrl=`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/%E4%BC%81%E6%A5%AD%E7%AE%A1%E7%90%86%E4%B8%80%E8%A6%A7!A:R:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`;
+    const res=await fetch(appendUrl,{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+state.token,'Content-Type':'application/json'},
+      body:JSON.stringify({values:[row]})
+    });
+    const json=await res.json();
+    if(json.error)throw new Error(json.error.message);
+    showSheetsResult(`✓ 「${d.company_name}」を企業管理一覧に追記しました！`,'ok');
+  }catch(e){
+    showSheetsResult('書き込みエラー: '+e.message,'err');
+  }finally{
+    document.getElementById('sheetsBtn').disabled=false;
+  }
+}
+
+function showSheetsResult(msg,type){
+  const el=document.getElementById('sheetsResult');
+  el.textContent=msg;el.className='sheets-result'+(type?' '+type:'');el.style.display='block';
+}
+
+// restore client id
+const saved=localStorage.getItem('gClientId');
+if(saved){document.getElementById('clientIdInput').value=saved;document.getElementById('clientConfig').style.display='none';}
+</script>
